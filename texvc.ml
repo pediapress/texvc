@@ -3,7 +3,7 @@ let lexer_token_safe lexbuf =
     try Lexer.token lexbuf
     with Failure s -> raise (LexerException s)
 
-let render tmppath finalpath tree =
+let render tmppath finalpath tree resolution_in_dpi =
     let outtex = Util.mapjoin Texutil.render_tex tree in
     let md5 = Digest.to_hex (Digest.string outtex) in
     begin
@@ -19,11 +19,12 @@ let render tmppath finalpath tree =
 	  | Some h,Html.LIBERAL,Some m -> "L" ^ md5 ^ h ^ "\000" ^ m
 	  | None,_,Some m -> "X" ^ md5   ^ m
 	);
-	Render.render tmppath finalpath outtex md5
+	Render.render tmppath finalpath outtex md5 resolution_in_dpi
     end
 let _ =
-    Texutil.set_encoding (try Sys.argv.(4) with _ -> "UTF-8");
-    try render Sys.argv.(1) Sys.argv.(2) (Parser.tex_expr lexer_token_safe (Lexing.from_string Sys.argv.(3)))
+  Texutil.set_encoding (try Sys.argv.(4) with _ -> "UTF-8");
+  let resolution_in_dpi = (try int_of_string Sys.argv.(5) with _ -> 120) in
+    try render Sys.argv.(1) Sys.argv.(2) (Parser.tex_expr lexer_token_safe (Lexing.from_string Sys.argv.(3))) resolution_in_dpi
     with Parsing.Parse_error -> print_string "S"
        | LexerException _ -> print_string "E"
        | Texutil.Illegal_tex_function s -> print_string ("F" ^ s)
@@ -32,3 +33,4 @@ let _ =
        | Failure _ -> print_string "-"
        | Render.ExternalCommandFailure s -> ()
        | _ -> print_string "-"
+
