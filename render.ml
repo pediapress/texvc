@@ -1,7 +1,7 @@
 let cmd_dvips tmpprefix = "dvips -q -R -E " ^ tmpprefix ^ ".dvi -f >" ^ tmpprefix ^ ".ps"
 let cmd_latex tmpprefix = "latex " ^ tmpprefix ^ ".tex >/dev/null"
 (* Putting -transparent white in converts arguments will sort-of give you transperancy *)
-let cmd_convert tmpprefix finalpath = "convert -quality 100 -density 120 " ^ tmpprefix ^ ".ps " ^ finalpath ^ " >/dev/null 2>/dev/null"
+let cmd_convert tmpprefix finalpath resolution_in_dpi = "convert -quality 100 -density " ^ (string_of_int resolution_in_dpi) ^ " " ^ tmpprefix ^ ".ps " ^ finalpath ^ " >/dev/null 2>/dev/null"
 (* Putting -bg Transparent in dvipng's arguments will give full-alpha transparency *)
 (* Note that IE have problems with such PNGs and need an additional javascript snippet *)
 (* Putting -bg transparent in dvipng's arguments will give binary transparency *)
@@ -33,7 +33,7 @@ let render tmppath finalpath outtex md5 resolution_in_dpi =
 	else if (Sys.command (cmd_dvipng tmpprefix (finalpath^"/"^md5^".png") resolution_in_dpi)  != 0)
 	then (if (Sys.command (cmd_dvips tmpprefix) != 0)
 	then (unlink_all (); raise (ExternalCommandFailure "dvips"))
-	else if (Sys.command (cmd_convert tmpprefix (finalpath^"/"^md5^".png")) != 0)
+	else if (Sys.command (cmd_convert tmpprefix (finalpath^"/"^md5^".png") resolution_in_dpi) != 0)
 	then (unlink_all (); raise (ExternalCommandFailure "convert"))
 	else unlink_all ())
 	else unlink_all ()
