@@ -9,6 +9,7 @@ render.o render.cmi render.cmo render.cmx texvc_tex.cmx \
 texvc_tex.o texvc_tex.cmi texvc_tex html.cmi html.cmo html.cmx \
 html.o mathml.cmi mathml.cmo mathml.cmx mathml.o
 CGIPATH=-I /usr/lib/ocaml/cgi -I /usr/lib/ocaml/netstring -I /usr/lib/ocaml/pcre
+PREFIX=/usr/local
 
 all: texvc texvc_test texvc_tex
 texvc.bc: util.cmo parser.cmo html.cmo mathml.cmo texutil.cmo render.cmo lexer.cmo texvc.cmo
@@ -36,6 +37,9 @@ texvc_cgi: util.cmo parser.cmo texutil.cmo render.cmo lexer.cmo texvc_cgi.cmo
 	chmod g-w $@
 clean:
 	rm -f $(OBJ)
+
+install:: all
+	install -m 755 -p -s texvc texvc_test texvc_tex $(PREFIX)/bin
 
 html.cmo: render_info.cmi tex.cmi util.cmo html.cmi 
 html.cmx: render_info.cmi tex.cmi util.cmx html.cmi 
