@@ -1,0 +1,7 @@
+*.cmi
+*.o
+*.cmx
+/parser.mli
+/texvc
+/texvc_test
+/texvc_tex
